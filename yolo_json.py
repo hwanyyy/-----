@@ -2,9 +2,10 @@ import json
 import os
 from os.path import join
 import pickle
+import glob
 
 json_path = 'json_labels'           # json_utf-8
-yolo_label_path = 'yolo_labels'     
+yolo_label_path = 'yolo_labels'     # only label
 
 def save_to_utf8():
     # unicode json path
@@ -78,9 +79,28 @@ def format_yolo_label():
                     print(object_class, x_center, y_center, width, height, file=f)
 
 
+def remove_none_object():
+    label_list = [x for x in os.listdir(yolo_label_path) if x.endswith('.txt')]
+    empty_labels = []
+
+    for file in label_list:
+        with open(join(yolo_label_path, file), 'r', encoding='utf-8') as f:
+            if f.readline() == '': 
+                empty_labels.append(file)
+    
+    print('empty file: ', len(empty_labels))
+
+    # remove empty label & image
+    path = 'test'   # include both image and label
+
+    for f in empty_labels:
+        name, ext = os.path.splitext(f)
+        os.remove(join(path, name + ext))    # remove .txt
+        os.remove(join(path, name + '.png')) # remove .png
 
 
 if __name__ == "__main__":
     # save_to_utf8()
     # label_to_int()
-    format_yolo_label()
+    # format_yolo_label()
+    remove_none_object()
