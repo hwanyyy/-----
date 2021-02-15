@@ -145,13 +145,11 @@ def test(data,
                     if conf > 0.5:
                         #xywh = (xyxy2xywh(torch.tensor(xyxy).view(1, 4)) / gn).view(-1).tolist()  # normalized xywh
                         xywh = torch.tensor(xyxy).view(1, 4).view(-1).tolist()  # normalized xywh
-                        line = (cls, conf, *xywh) if save_conf else (cls, *xywh)  # label format
-                        line_list = list(line)
-                        line_list[0] = cls_dict.get(list(line)[0]).replace("'", "")
-                        line = tuple(line_list)
+                        line = [cls, conf, *xywh] if save_conf else [cls, *xywh]  # label format
+                        line[0] = cls_dict.get(list(line)[0]).replace("'", "")
+
                         with open(save_dir / 'labels' / ('result_' + path.stem.split('_')[-1] + '.txt'), 'a') as f:
-                            #f.write(('%g ' * len(line)).rstrip() % line + '\n')
-                            print(' '.join([str(_) for _ in line_list]), file=f)
+                            print(' '.join([str(_) for _ in line]), file=f)
 
             # W&B logging
             if plots and len(wandb_images) < log_imgs:
