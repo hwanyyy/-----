@@ -60,7 +60,7 @@ def detect(save_img=False):
     if device.type != 'cpu':
         model(torch.zeros(1, 3, imgsz, imgsz).to(device).type_as(next(model.parameters())))  # run once
     t0 = time.time()
-    for path, img, im0s, vid_cap in dataset:
+    for img_id, (path, img, im0s, vid_cap) in enumerate(dataset):
         img = torch.from_numpy(img).to(device)
         img = img.half() if half else img.float()  # uint8 to fp16/32
         img /= 255.0  # 0 - 255 to 0.0 - 1.0
@@ -104,11 +104,12 @@ def detect(save_img=False):
                 cls_dict = {0: 'car', 1: 'person', 2: 'bike'}
                 for *xyxy, conf, cls in reversed(det):
                     if save_txt:  # Write to file
-                        xyxy_ = torch.tensor(xyxy).view(1, 4).view(-1).tolist()  # normalized xyxy_
+                        xyxy_ = torch.tensor(xyxy, dtype=torch.int32).view(1, 4).view(-1).tolist()  # normalized xyxy_
                         line = [cls, conf.data, *xyxy_] if opt.save_conf else [cls.data, *xyxy_]  # label format
                         line[0] = cls_dict.get(line[0].item())
                         line[1] = line[1].item()
-                        with open(save_dir / 'labels' / ('result_' + txt_path.split('_')[-1] + '.txt'), 'a') as f:
+                        
+                        with open(save_dir / 'labels' / ('result_%05d.txt'% (img_id + 1)), 'a') as f:
                             print(' '.join([str(_) for _ in line]), file=f)
 
                     if save_img or view_img:  # Add bbox to image
