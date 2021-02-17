@@ -109,7 +109,7 @@ def detect(save_img=False):
                         line[0] = cls_dict.get(line[0].item())
                         line[1] = line[1].item()
                         
-                        with open(save_dir / 'labels' / ('result_%05d.txt'% img_id), 'a') as f:
+                        with open(save_dir / 'labels' / ('result_%05d.txt'% (img_id + 1)), 'a') as f:
                             print(' '.join([str(_) for _ in line]), file=f)
 
                     if save_img or view_img:  # Add bbox to image
